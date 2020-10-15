@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -l
 
 # Combo of
 # - https://github.com/cpina/github-action-push-to-another-repository
