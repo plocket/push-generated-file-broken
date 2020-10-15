@@ -5,6 +5,10 @@
 # - https://github.com/dmnemec/copy_file_to_another_repo_action
 # Also used https://www.shellcheck.net/
 
+# Hope to produce better error feedback.
+set -e
+set -x
+
 echo "Starts"
 SOURCE_USERNAME="$INPUT_USER_NAME"
 SOURCE_EMAIL="$INPUT_USER_EMAIL"
