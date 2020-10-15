@@ -1,0 +1,40 @@
+# Combo of:
+# - https://github.com/cpina/github-action-push-to-another-repository/blob/master/action.yml
+# - https://github.com/dmnemec/copy_file_to_another_repo_action/blob/master/action.yml
+
+name: 'Push generated file'
+description: 'Push a file you generate to a directory in another repository in which you have permissions'
+inputs:
+  source_file:
+    description: "Generated file, including a directory path if it has one. Example: 'path/file.json'"
+    required: true
+  user_name:
+    description: 'User name that will be shown in the git commit'
+    required: true
+  user_email:
+    description: 'Email that will be shown in the git commit'
+    required: true
+  destination_repo:
+    description: "Name of the destination. Example: 'user_name/repo_name'"
+    required: true
+  destination_folder:
+    description: '[Optional] Directory to push the file to'
+    required: false
+  destination_branch:
+    description: '[Optional] Branch to push file to, defaults to main'
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  # Are these needed? In https://github.com/dmnemec/copy_file_to_another_repo_action/blob/master/action.yml
+  # they don't seem to match the variable names at all and it uses no args.
+  args:
+    - ${{ inputs.source-file }}
+    - ${{ inputs.user-name }}
+    - ${{ inputs.user-email }}
+    - ${{ inputs.destination-repo }}
+    - ${{ inputs.destination-folder }}
+    - ${{ inputs.destination-branch }}
+branding:
+  icon: 'git-commit'
+  color: 'green'
