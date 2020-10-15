@@ -31,7 +31,7 @@ if [ -z "$INPUT_SOURCE_FILE" ]
 then
   echo "source_file must be defined. It can include a directory path."
 fi
-if [ -z "$SOURCE_USER_NAME" ]
+if [ -z "$SOURCE_USERNAME" ]
 then
   echo "user_name must be defined"
 fi
