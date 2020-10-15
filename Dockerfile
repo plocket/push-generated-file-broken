@@ -1,6 +1,6 @@
 FROM alpine:3.10
 
-RUN apk add --no-cache git
+RUN chmod +x entrypoint.sh && apk add --no-cache git
 
 COPY push-generated-file.sh /push-generated-file.sh
 
