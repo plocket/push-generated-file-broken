@@ -3,38 +3,32 @@
 # - https://github.com/dmnemec/copy_file_to_another_repo_action/blob/master/action.yml
 
 name: 'Push generated file'
-description: 'Push a file you generate to a directory in another repository in which you have permissions'
+description: 'Push a generated file to another repository'
 inputs:
-  source_file:
-    description: "Generated file, including a directory path if it has one. Example: 'path/file.json'"
+  token:
+    description: 'Github token for this action (you have to create this in your settings).'
     required: true
-  user_name:
-    description: 'User name that will be shown in the git commit'
-    required: true
-  user_email:
-    description: 'Email that will be shown in the git commit'
+  source_file_path:
+    description: '"Path" to generated file. Example: path/to/file.md'
     required: true
   destination_repo:
-    description: "Name of the destination. Example: 'user_name/repo_name'"
+    description: 'Repository to push file to. Example: some_user/some_repo'
     required: true
   destination_folder:
-    description: '[Optional] Directory to push the file to'
+    description: 'Folder or folders to create or use in destination repository.'
+    required: true
+  target_branch:
+    description: '[Optional] set target branch name for the destination repository. Default is "main".'
     required: false
-  destination_branch:
-    description: '[Optional] Branch to push file to, defaults to main'
+  author:
+    description: "[Optional] Name of the commit's author. Default is user name of account doing action."
+    required: false
+  author_email:
+    description: '[Optional] Email for the commit. Default is author@no-reply...'
     required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  # Are these needed? In https://github.com/dmnemec/copy_file_to_another_repo_action/blob/master/action.yml
-  # they don't seem to match the variable names at all and it uses no args.
-  args:
-    - ${{ inputs.source-file }}
-    - ${{ inputs.user-name }}
-    - ${{ inputs.user-email }}
-    - ${{ inputs.destination-repo }}
-    - ${{ inputs.destination-folder }}
-    - ${{ inputs.destination-branch }}
 branding:
   icon: 'git-commit'
   color: 'green'
