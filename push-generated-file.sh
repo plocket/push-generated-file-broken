@@ -1,79 +1,46 @@
 #!/bin/sh -l
 
-# Combo of
+# Combination of:
 # - https://github.com/cpina/github-action-push-to-another-repository
 # - https://github.com/dmnemec/copy_file_to_another_repo_action
-# Also used https://www.shellcheck.net/
 
-# Produce better feedback about errors
 set -e
 set -x
 
-echo "Starts"
-SOURCE_USERNAME="$INPUT_USER_NAME"
-SOURCE_EMAIL="$INPUT_USER_EMAIL"
-# DESTINATION_USERNAME="$5"
-DESTINATION_REPO="$INPUT_DESTINATION_REPO"
-DESTINATION_BRANCH="$INPUT_DESTINATION_BRANCH"
+echo "Start"
 
-# Give warnings
-if [ -z "$INPUT_SOURCE_FILE" ]
+if [ -z "$INPUT_AUTHOR" ]
 then
-  echo "source_file must be defined. It can include a directory path."
+  INPUT_AUTHOR="$GITHUB_ACTOR"
 fi
-if [ -z "$SOURCE_USERNAME" ]
+if [ -z "$INPUT_AUTHOR_EMAIL" ]
 then
-  echo "user_name must be defined"
+  INPUT_AUTHOR_EMAIL="$INPUT_AUTHOR@users.noreply.github.com"
 fi
-if [ -z "$SOURCE_EMAIL" ]
+if [ -z "$INPUT_TARGET_BRANCH" ]
 then
-  echo "user_email must be defined"
-fi
-if [ -z "$DESTINATION_REPO" ]
-then
-  echo "destination_repo must be defined"
-fi
-# Does this have to be defined, or can it be an empty string?
-#if [ -z "$INPUT_DESTINATION_FOLDER" ]
-#then
-#  echo "destination_folder must be defined"
-#fi
-
-# Set defaults
-if [ -z "$INPUT_DESTINATION_FOLDER" ]
-then
-  INPUT_DESTINATION_FOLDER=""
-fi
-if [ -z "$DESTINATION_BRANCH" ]
-then
-  DESTINATION_BRANCH="main"
+  INPUT_TARGET_BRANCH="main"
 fi
 
 CLONE_DIR=$(mktemp -d)
 
 echo "Cloning destination git repository"
-git config --global user.email "$SOURCE_EMAIL"
-git config --global user.name "$SOURCE_USERNAME"
-git clone --single-branch --branch "$DESTINATION_BRANCH" "https://$API_TOKEN_GITHUB@github.com/$DESTINATION_REPO.git" "$CLONE_DIR"
+# Setup git
+git config --global user.email "$INPUT_AUTHOR_EMAIL"
+git config --global user.name "$INPUT_AUTHOR"
+git clone --single-branch --branch "$INPUT_TARGET_BRANCH" "https://$INPUT_TOKEN@github.com/$INPUT_DESTINATION_REPO.git" "$CLONE_DIR"
 ls -la "$CLONE_DIR"
 
-#echo "Cleaning destination repository of old files"
-## Copy files into the git and deletes all git
-#find "$CLONE_DIR" | grep -v "^$CLONE_DIR/\.git" | grep -v "^$CLONE_DIR$" | xargs rm -rf # delete all files (to handle deletions)
-#ls -la "$CLONE_DIR"
-
 echo "Copying contents to to git repo"
-mkdir -p "$CLONE_DIR/$INPUT_DESTINATION_FOLDER"
-cp -R "$INPUT_SOURCE_FILE" "$CLONE_DIR/$INPUT_DESTINATION_FOLDER"
+mkdir -p $CLONE_DIR/$INPUT_DESTINATION_FOLDER
+cp -r "$INPUT_SOURCE_FILE_PATH"/* "$CLONE_DIR/$INPUT_DESTINATION_FOLDER"
 cd "$CLONE_DIR"
+ls -la
 
 echo "Adding git commit"
 git add .
-if git status | grep -q "Changes to be committed"
-then
-  git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
-  echo "Pushing git commit"
-  git push origin "$INPUT_DESTINATION_BRANCH"
-else
-  echo "No changes detected"
-fi
+git status
+git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+
+echo "Pushing git commit"
+git push origin "$INPUT_TARGET_BRANCH"
